@@ -1,0 +1,17 @@
+{
+  "name": "rnConfusion",
+  "displayName": "rnConfusion",
+  "expo": {
+    "name": "rnConfusion",
+    "slug": "rnConfusion",
+    "version": "1.0.0",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
