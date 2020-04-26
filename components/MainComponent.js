@@ -4,6 +4,7 @@ import Menu from './MenuComponent';
 import Contact from './ContactComponent';
 import About from './AboutComponent';
 import Dishdetail from './DishDetailComponent';
+import Reservation from './ReservationComponent';
 import { View, Platform, Image, StyleSheet, ScrollView, Text } from 'react-native';
 import {createAppContainer, SafeAreaView } from 'react-navigation';
 import { createStackNavigator} from 'react-navigation-stack';
@@ -101,6 +102,22 @@ const ContactNavigator = createStackNavigator({
     }
 )});
 
+
+const ReservationNavigator = createStackNavigator({
+    Reservation: {screen: Reservation},
+}, {
+    defaultNavigationOptions: ({ navigation }) => ({
+        headerStyle: {
+            backgroundColor: '#512DA8',
+        },
+        headerTintColor: '#fff',
+        heaederTitleStyle: {
+            color: '#fff'
+        },
+        headerLeft: () => <MenuIcon navigation={navigation} />
+    }
+)});
+
 const CustomDrawerContentComponent = (props) => (
     <ScrollView>
         <SafeAreaView style={styles.container}
@@ -135,7 +152,7 @@ const MainNavigator = createDrawerNavigator({
         }
     },
     
-    'About Us': {
+    About: {
         screen: AboutNavigator,
         navigationOptions: {
             title: 'About Us',
@@ -163,7 +180,7 @@ const MainNavigator = createDrawerNavigator({
             )
         }
     },
-    'Contact Us': {
+    Contact: {
         screen: ContactNavigator,
         navigationOptions: {
             title: 'Contact Us',
@@ -173,6 +190,21 @@ const MainNavigator = createDrawerNavigator({
                     name='address-card'
                     type='font-awesome'
                     size={22}
+                    color={tintColor}/>
+            )
+        }
+    },
+    
+    Reservation: {
+        screen: ReservationNavigator,
+        navigationOptions: {
+            title: 'Reserve a Table',
+            drawerLabel: 'Reserve a Table',
+            drawerIcon: ({ tintColor }) => (
+                <Icon
+                    name='cutlery'
+                    type='font-awesome'
+                    size={24}
                     color={tintColor}/>
             )
         }
