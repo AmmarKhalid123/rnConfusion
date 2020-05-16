@@ -5,12 +5,14 @@ import Contact from './ContactComponent';
 import About from './AboutComponent';
 import Dishdetail from './DishDetailComponent';
 import Reservation from './ReservationComponent';
+import Favorites from './FavoriteComponent';
 import { View, Platform, Image, StyleSheet, ScrollView, Text } from 'react-native';
 import {createAppContainer, SafeAreaView } from 'react-navigation';
 import { createStackNavigator} from 'react-navigation-stack';
 import { createDrawerNavigator, DrawerItems } from 'react-navigation-drawer';
 import { Icon } from 'react-native-elements';
 import { connect } from 'react-redux';
+import Constants from 'expo-constants';
 import { fetchDishes, fetchComments, fetchPromos, fetchLeaders } from '../redux/ActionCreators';
 
 const mapStatetoProps = state => {
@@ -118,6 +120,21 @@ const ReservationNavigator = createStackNavigator({
     }
 )});
 
+const FavoritesNavigator = createStackNavigator({
+    Favorites: {screen: Favorites},
+}, {
+    defaultNavigationOptions: ({ navigation }) => ({
+        headerStyle: {
+            backgroundColor: '#512DA8',
+        },
+        headerTintColor: '#fff',
+        heaederTitleStyle: {
+            color: '#fff'
+        },
+        headerLeft: () => <MenuIcon navigation={navigation} />
+    }
+)});
+
 const CustomDrawerContentComponent = (props) => (
     <ScrollView>
         <SafeAreaView style={styles.container}
@@ -194,6 +211,20 @@ const MainNavigator = createDrawerNavigator({
             )
         }
     },
+    Favorites: {
+        screen: FavoritesNavigator,
+        navigationOptions: {
+            title: 'My Favorites',
+            drawerLabel: 'My Favorites',
+            drawerIcon: ({ tintColor }) => (
+                <Icon
+                    name='heart'
+                    type='font-awesome'
+                    size={24}
+                    color={tintColor}/>
+            )
+        }
+    },
     
     Reservation: {
         screen: ReservationNavigator,
@@ -227,7 +258,7 @@ class Main extends Component {
 
     render() {
         return(
-            <View style={{flex:1, paddingTop: Platform.OS === 'ios' ? 0 : Expo.Constants.statusBarHeight}}>
+            <View style={{flex:1, paddingTop: Platform.OS === 'ios' ? 0 : Constants.statusBarHeight}}>
             <MainNavigatorApp />
              </View>
         );

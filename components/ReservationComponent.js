@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { Text, View, ScrollView, Picker, Switch, Button, StyleSheet } from 'react-native';
+import { Text, View, ScrollView, Picker, Switch, Button, StyleSheet, Modal } from 'react-native';
 import { Card } from 'react-native-elements';
 import DatePicker from 'react-native-datepicker';
+
 
 class Reservation extends Component {
     constructor(props) {
@@ -9,16 +10,23 @@ class Reservation extends Component {
         this.state = {
             guests: 1,
             smoking: false,
+            showModal: false,
             date: ''
         }
     }
     handleReservation() {
         console.log(JSON.stringify(this.state));
+        this.toggleModal();
+    }
+    resetForm() {
         this.setState({
             guests: 1,
             smoking: false,
             date: ''
         });
+    }
+    toggleModal() {
+        this.setState({showModal: !this.state.showModal})
     }
 
     static navigationOptions = {
@@ -28,7 +36,7 @@ class Reservation extends Component {
     render() {
         return(
             <ScrollView>
-                <View style={styles.formRow}> 
+                <View style={styles.formRow}>
                     <Text style={styles.formLabel}>Number of Guests</Text>
                     <Picker
                         style={styles.formItem}
@@ -56,11 +64,9 @@ class Reservation extends Component {
                 <View style={styles.formRow}>
                     <Text style={styles.formLabel}>Date and Time</Text>
                     <DatePicker
-                        style={{flex: 2, marginRight: 2}}
                         date={this.state.date}
                         format=''
                         mode='datetime'
-                        placeholder='select date and time'
                         minDate='2017-01-01'
                         confirmBtnTxt='Confirm'
                         cancelBtnTxt='Cancel'
@@ -75,15 +81,34 @@ class Reservation extends Component {
                                 marginLeft: 36
                             }
                         }}
+                        onDateChange={(date) => {this.setState({date: date})}}
                         />
                 </View>
                 <View style={styles.formRow}>
-                    <Button 
+                    <Button
                         title='Reserve'
                         color='#512DA8'
                         onPress={() => this.handleReservation()}
                         accessibilityLabel='Learn more about this purple button'/>
                 </View>
+                <Modal
+                    animationType={'slide'}
+                    transparent={false}
+                    visible={this.state.showModal}
+                    onDismiss={() => {this.toggleModal(); this.resetForm();}}
+                    onRequestClose={() => {this.toggleModal(); this.resetForm();}}
+                    >
+                        <View style={styles.modal}>
+                            <Text style={styles.modalTitle}>Your Reservation</Text>
+                            <Text style={styles.modalText}>Number of Guests: {this.state.guests}</Text>
+                            <Text style={styles.modalText}>Smoking? : {this.state.smoking.toString()}</Text>
+                            <Text style={styles.modalText}>Date and Time: {this.state.date}</Text>
+                            <Button
+                                onPress={() => {this.toggleModal(); this.resetForm()}}
+                                color='#512DA8'
+                                title='Close' />
+                        </View>
+                    </Modal>
             </ScrollView>
         ) ;
     }
@@ -95,7 +120,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         flex: 1,
         flexDirection: 'row',
-        margin: 20 
+        margin: 20
     },
     formLabel: {
         fontSize: 18,
@@ -103,6 +128,22 @@ const styles = StyleSheet.create({
     },
     formItem: {
         flex: 1
+    },
+    modal: {
+        justifyContent: "center",
+        margin: 20
+    },
+    modalTitle: {
+        fontSize: 24,
+        fontWeight: "bold",
+        backgroundColor: '#512DA8',
+        textAlign: 'center',
+        color: 'white',
+        marginBottom: 20
+    },
+    modalText: {
+        fontSize: 18,
+        margin: 10
     }
 })
 
