@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, ScrollView, FlatList,Button, Modal, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, FlatList,Button, Modal, StyleSheet, Alert, PanResponder } from 'react-native';
 import { Card, Icon, Rating, Input } from 'react-native-elements';
 import { connect } from 'react-redux';
 import { baseUrl } from '../shared/baseUrl';
@@ -23,12 +23,12 @@ class RenderDish extends Component {
     constructor(props){
         super(props);
         this.state = {
-        showModal: false,
-        author: '',
-        rating: 5,
-        comment: ''
-    };
-}
+            showModal: false,
+            author: '',
+            rating: 5,
+            comment: ''
+        };
+    }
     
 
     toggleModal(){
@@ -52,104 +52,138 @@ class RenderDish extends Component {
         comment: ''
         });
     }
-    
+    handleViewRef = ref => this.view = ref;
     render (){
         const dish = this.props.dish;
-    if (dish != null ) {
-        return(
-            <Animatable.View animation="fadeInDown" duration={2000} delay={1000}>
+        const recognizeDrag = ({ moveX, moveY, dx, dy }) => {
+            if (dx < -200){
+                return true;
+            }
+            else {
+                return false;
+            }
+        };
+        const panResponder = PanResponder.create({
+            onStartShouldSetPanResponder: (e, gestureState) => {
+                return true;
+            },
+            onPanResponderGrant: () => {
+                this.view.rubberBand(1000)
+                .then(endState => console.log(endState.finished ? 'finished' : 'not finished'))
+            },
+            onPanResponderEnd: (e, gestureState) => {
+                if (recognizeDrag(gestureState)){
+                    Alert.alert(
+                        'Add to Favorites?',
+                        'Are you sure you wish to add to add ' + dish.name + ' to your favorites?',
+                        [
+                            {text: 'cancel', onPress: () => console.log('Cancel Pressed!'), style: 'cancel'},
+                            {text: 'OK', onPress: () => this.props.favorite ? console.log('Already Favorite') : this.props.onPress()}
 
-            <Card
-                
-                featuredTitle={dish.name}
-                image={{uri: baseUrl+dish.image}}
+                        ],
+                        { cancelable: false }
+                    )
+                }
+                return true;
+            }
+        })
+        if (dish != null ) {
+            return(
+                <Animatable.View animation="fadeInDown" duration={2000} delay={1000}
+                ref={this.handleViewRef}
+                {...panResponder.panHandlers}
                 >
-                <Text style={{
-                    margin: 10
-                }}>{dish.description}</Text>
-                    <View style={{flexDirection: 'row', justifyContent: 'center'}}>
-
-                <Icon 
-                    raised 
-                    reverse
-                    name={this.props.favorite ? 'heart' : 'heart-o'}
-                    type='font-awesome'
-                    color='#f50'
-                    onPress={() => this.props.favorite ? console.log('Already Favorite') : this.props.onPress()}
-                    />
-                <Icon
-                    raised
-                    reverse
-                    name='pencil'
-                    type='font-awesome'
-                    color='#f50'
-                    onPress={() => this.toggleModal()}
-                    />
-                    </View>                
-                <Modal
-                    animationType={'slide'}
-                    transparent={false}
-                    visible={this.state.showModal}
-                    onDismiss={() => {this.toggleModal(); this.resetForm()}}
-                    onRequestClose={() => {this.toggleModal(); this.resetForm()}}
+                <Card
+                    
+                    featuredTitle={dish.name}
+                    image={{uri: baseUrl+dish.image}}
                     >
-                        <View style={styles.modalItem}>
-                        <Rating
-                        showRating
-                        onFinishRating={(value) => this.setRating(value)}
+                    <Text style={{
+                        margin: 10
+                    }}>{dish.description}</Text>
+                        <View style={{flexDirection: 'row', justifyContent: 'center'}}>
+
+                    <Icon 
+                        raised 
+                        reverse
+                        name={this.props.favorite ? 'heart' : 'heart-o'}
+                        type='font-awesome'
+                        color='#f50'
+                        onPress={() => this.props.favorite ? console.log('Already Favorite') : this.props.onPress()}
                         />
-                        </View>
-                        <View style={styles.modalItem}>
-                        <Input
-                            placeholder=' Author'
-                            onChangeText={text => this.setAuthor(text)}
-                            defaultValue={this.state.author}
-                            leftIcon={
-                                <Icon
-                                name='user-o'
-                                type='font-awesome'
-                                size={24}
-                                color='black'
-                                />
-                            }
+                    <Icon
+                        raised
+                        reverse
+                        name='pencil'
+                        type='font-awesome'
+                        color='#f50'
+                        onPress={() => this.toggleModal()}
+                        />
+                        </View>                
+                    <Modal
+                        animationType={'slide'}
+                        transparent={false}
+                        visible={this.state.showModal}
+                        onDismiss={() => {this.toggleModal(); this.resetForm()}}
+                        onRequestClose={() => {this.toggleModal(); this.resetForm()}}
+                        >
+                            <View style={styles.modalItem}>
+                            <Rating
+                            showRating
+                            onFinishRating={(value) => this.setRating(value)}
                             />
-                        </View>
-                        <View style={styles.modalItem}>
-                        <Input
-                            placeholder=' Comment'
-                            onChangeText={text => this.setComment(text)}
-                            defaultValue={this.state.comment}
-                            leftIcon={
-                                <Icon
-                                name='comment-o'
-                                type='font-awesome'
-                                size={24}
-                                color='black'
+                            </View>
+                            <View style={styles.modalItem}>
+                            <Input
+                                placeholder=' Author'
+                                onChangeText={text => this.setAuthor(text)}
+                                defaultValue={this.state.author}
+                                leftIcon={
+                                    <Icon
+                                    name='user-o'
+                                    type='font-awesome'
+                                    size={24}
+                                    color='black'
+                                    />
+                                }
                                 />
-                            }
-                            />
-                        </View>                        
-                        <View style={styles.modalItem}>
-                        
-                            <Button
-                                onPress={() => {this.props.postComment(dish.id, this.state.rating, this.state.author, this.state.comment);
-                                                this.toggleModal()}}
-                                color='#512DA8'
-                                title='Submit' />
-                        </View>
-                              
-                        <View style={styles.modalItem}>
-                        
-                            <Button
-                                onPress={() => {this.toggleModal(); this.resetForm()}}
-                                color='grey'
-                                title='Close' />
-                        </View>  
-                                              
-                    </Modal>
-            </Card>
-            </Animatable.View>
-        );
+                            </View>
+                            <View style={styles.modalItem}>
+                            <Input
+                                placeholder=' Comment'
+                                onChangeText={text => this.setComment(text)}
+                                defaultValue={this.state.comment}
+                                leftIcon={
+                                    <Icon
+                                    name='comment-o'
+                                    type='font-awesome'
+                                    size={24}
+                                    color='black'
+                                    />
+                                }
+                                />
+                            </View>                        
+                            <View style={styles.modalItem}>
+                            
+                                <Button
+                                    onPress={() => {this.props.postComment(dish.id, this.state.rating, this.state.author, this.state.comment);
+                                                    this.toggleModal()}}
+                                    color='#512DA8'
+                                    title='Submit' />
+                            </View>
+                                
+                            <View style={styles.modalItem}>
+                            
+                                <Button
+                                    onPress={() => {this.toggleModal(); this.resetForm()}}
+                                    color='grey'
+                                    title='Close' />
+                            </View>  
+                                                
+                        </Modal>
+                </Card>
+                </Animatable.View>
+            );
     }
     else {
         return(
