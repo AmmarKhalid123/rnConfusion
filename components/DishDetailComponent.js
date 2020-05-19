@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, ScrollView, FlatList,Button, Modal, StyleSheet, Alert, PanResponder } from 'react-native';
+import { View, Text, ScrollView, FlatList,Button, Modal, StyleSheet, Alert, PanResponder, Share } from 'react-native';
 import { Card, Icon, Rating, Input } from 'react-native-elements';
 import { connect } from 'react-redux';
 import { baseUrl } from '../shared/baseUrl';
@@ -53,6 +53,7 @@ class RenderDish extends Component {
         });
     }
     handleViewRef = ref => this.view = ref;
+    
     render (){
         const dish = this.props.dish;
         const recognizeDrag = ({ moveX, moveY, dx, dy }) => {
@@ -98,6 +99,18 @@ class RenderDish extends Component {
                 return true;
             }
         })
+        
+        const shareDish = (title, message, url) => {
+            Share.share({
+                title: title,
+                message: title + ': ' + message + ' ' + url,
+                url: url
+            },{
+                dialogTitle: 'Share ' + title
+            })
+        }
+
+
         if (dish != null ) {
             return(
                 <Animatable.View animation="fadeInDown" duration={2000} delay={1000}
@@ -129,6 +142,14 @@ class RenderDish extends Component {
                         type='font-awesome'
                         color='#f50'
                         onPress={() => this.toggleModal()}
+                        />
+                        <Icon 
+                        raised
+                        reverse
+                        name='share'
+                        type='font-awesome'
+                        color='#51D2A8'
+                        onPress={()=>shareDish(dish.name, dish.description, baseUrl + dish.image)}
                         />
                         </View>                
                     <Modal
