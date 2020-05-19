@@ -6,6 +6,7 @@ import About from './AboutComponent';
 import Dishdetail from './DishDetailComponent';
 import Reservation from './ReservationComponent';
 import Favorites from './FavoriteComponent';
+import Login from './LoginComponent';
 import { View, Platform, Image, StyleSheet, ScrollView, Text } from 'react-native';
 import {createAppContainer, SafeAreaView } from 'react-navigation';
 import { createStackNavigator} from 'react-navigation-stack';
@@ -134,7 +135,20 @@ const FavoritesNavigator = createStackNavigator({
         headerLeft: () => <MenuIcon navigation={navigation} />
     }
 )});
-
+const LoginNavigator = createStackNavigator({
+    Login: {screen: Login},
+}, {
+    defaultNavigationOptions: ({ navigation }) => ({
+        headerStyle: {
+            backgroundColor: '#512DA8',
+        },
+        headerTintColor: '#fff',
+        heaederTitleStyle: {
+            color: '#fff'
+        },
+        headerLeft: () => <MenuIcon navigation={navigation} />
+    }
+)});
 const CustomDrawerContentComponent = (props) => (
     <ScrollView>
         <SafeAreaView style={styles.container}
@@ -154,6 +168,21 @@ const CustomDrawerContentComponent = (props) => (
 );
 
 const MainNavigator = createDrawerNavigator({
+    
+    Login: {
+        screen: LoginNavigator,
+        navigationOptions: {
+            title: 'Login',
+            drawerLabel: 'Login',
+            drawerIcon: ({ tintColor }) => (
+                <Icon
+                    name='sign-in'
+                    type='font-awesome'
+                    size={24}
+                    color={tintColor}/>
+            )
+        }
+    },
     Home: {
         screen: HomeNavigator,
         navigationOptions: {
@@ -241,8 +270,10 @@ const MainNavigator = createDrawerNavigator({
         }
     }
 }, {
+    initialRouteName: 'Home',
     drawerBackgroundColor: '#D1C4E9',
-    contentComponent: CustomDrawerContentComponent
+    contentComponent: CustomDrawerContentComponent,
+    unmountInactiveRoutes: true
 });
 
 const MainNavigatorApp = createAppContainer(MainNavigator);
